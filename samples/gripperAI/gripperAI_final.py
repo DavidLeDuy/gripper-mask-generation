@@ -64,6 +64,7 @@ class GripperConfig(Config):
     Derives from the base Config class and overrides some values.
     """
     # Give the configuration a recognizable name
+    # NOTE Change a name you want
     NAME = "gripper"
 
     # We use a GPU with 12GB memory, which can fit two images.
@@ -71,13 +72,13 @@ class GripperConfig(Config):
     IMAGES_PER_GPU = 2
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 2  # Background + objects
+    NUM_CLASSES = 1 + 2  # NOTE Background + objects
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 100
 
-    # Skip detections with < 90% confidence
-    DETECTION_MIN_CONFIDENCE = 0.5
+    # Skip detections with < 80% confidence
+    DETECTION_MIN_CONFIDENCE = 0.8
 
 
 ############################################################
@@ -90,7 +91,7 @@ class GripperDataset(utils.Dataset):
         dataset_dir: Root directory of the dataset.
         subset: Subset to load: train or val or predict
         """
-        # Add classes. We have only one class to add.
+        # NOTE Add classes. We have 2 classes here to add.
         self.add_class("gripper", 1, "würfel")
         self.add_class("gripper", 2, "zylinder")
 
@@ -139,7 +140,7 @@ class GripperDataset(utils.Dataset):
             image_path = os.path.join(dataset_dir, a['filename'])
             image = skimage.io.imread(image_path)
             height, width = image.shape[:2]
-
+            #NOTE Add image.
             self.add_image(
                 "gripper",
                 image_id=a['filename'],  # use file name as a unique image id
@@ -174,7 +175,7 @@ class GripperDataset(utils.Dataset):
         class_ids = np.zeros([len(info["polygons"])])
         # In the gripper dataset, pictures are labeled with name 'a' and 'r' representing arm and ring.
         for i, p in enumerate(class_names):
-        #"name" is the attributes name decided when labeling, etc. 'region_attributes': {name:'a'}
+        #NOTE "name" is the attributes name decided when labeling, etc. 'region_attributes': {name:'a'}
             if p['name'] == 'würfel':
                 class_ids[i] = 1
             elif p['name'] == 'zylinder':
@@ -205,6 +206,8 @@ def train(model, *dic):
     dataset_val.load_images(args.dataset, "val")
     dataset_val.prepare()
 
+    #NOTE we modify the callbacks which only saves the best model,
+    # instead of each epoch.
 
     callbacks = [
         keras.callbacks.EarlyStopping(
@@ -227,8 +230,6 @@ def train(model, *dic):
         )
     ]
     # *** This training schedule is an example. Update to your needs ***
-    # Since we're using a very small dataset, and starting from
-    # COCO trained weights, we don't need to train too long. Also,
     # no need to train all layers, just the heads should do it.
     print("Training network heads")
     model.train(dataset_train, dataset_val,
@@ -260,7 +261,7 @@ def color_splash(image, mask):
 
 def detect_and_color_splash(model, image_path=None, video_path=None, out_dir=''):
     assert image_path or video_path
-
+    #NOTE Modify class_names. BG = Background.
     class_names = ['BG', 'würfel', 'zylinder']
 
     # Image or video?
@@ -481,6 +482,7 @@ if __name__ == '__main__':
                                     class_names, r['scores'], ax=ax,title="predictions")
     
             path = os.getcwd()
+            #NOTE we also generate boundingbox and probability
             file_name = "/{:%Y%m%dT%H%M%S}_boundingbox.png".format(datetime.datetime.now())
             path2 = path + file_name  
             plt.savefig(path2)
