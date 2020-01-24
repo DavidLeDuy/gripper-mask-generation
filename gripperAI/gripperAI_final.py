@@ -60,6 +60,7 @@ DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
 
 class GripperConfig(Config):
+    
     """Configuration for training on the toy dataset.
     Derives from the base Config class and overrides some values.
     """
@@ -139,7 +140,7 @@ class GripperDataset(utils.Dataset):
             height, width = image.shape[:2]
             #NOTE Add image.
             self.add_image(
-                "user_settings["name"]",
+                user_settings["name"],
                 image_id=a['filename'],  # use file name as a unique image id
                 path=image_path,
                 width=width, height=height,
@@ -155,7 +156,7 @@ class GripperDataset(utils.Dataset):
         """
         # If not a gripper dataset image, delegate to parent class.
         image_info = self.image_info[image_id]
-        if image_info["source"] != "gripper":
+        if image_info["source"] != user_settings["name"]:
             return super(self.__class__, self).load_mask(image_id)
 
         # Convert polygons to a bitmap mask of shape
@@ -173,7 +174,7 @@ class GripperDataset(utils.Dataset):
         # In the gripper dataset, pictures are labeled with name 'a' and 'r' representing arm and ring.
         for i, p in enumerate(class_names):
         #FIXME "name" is the attributes name decided when labeling, etc. 'region_attributes': {name:'a'}
-        counter = 0
+            counter = 0
             for item in user_settings["classes"]:
                 counter+=1
                 if p['name'] == item:
