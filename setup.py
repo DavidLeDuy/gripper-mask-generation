@@ -34,9 +34,9 @@ except Exception:
 setup(
     name='mask-rcnn',
     version='2.1',
-    url='https://github.com/matterport/Mask_RCNN',
-    author='Matterport',
-    author_email='waleed.abdulla@gmail.com',
+    url='https://github.com/DavidLeDuy/gripper-mask-generation',
+    author='',
+    author_email='',
     license='MIT',
     description='Mask R-CNN for object detection and instance segmentation',
     packages=["mrcnn"],
