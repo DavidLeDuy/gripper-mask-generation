@@ -36,8 +36,11 @@ Thanks again for the great work of [matterport/Mask_RCNN](https://github.com/mat
 
 # Train your own dataset
 
-1. Prepare data into ["train", "val", "test"] folders. Suggested ratio of "train"/"val" = 8/2.
-2. Use [VGG Annotation](http://www.robots.ox.ac.uk/~vgg/software/via/via_demo.html) to label train/val data. And export annotations as JSON. Currently works only with polygon.
+1. Run settings.py
+   ```
+   python3 settings.py
+   ```
+2. Use [VGG Annotation](http://www.robots.ox.ac.uk/~vgg/software/via/via_demo.html) to label train/val data. settings.py creates a folders for your data. Suggested ratio of "train"/"val" = 8/2. And export annotations as JSON. Currently works only with polygon.
 3. Rename JSON file as 'via_region_data.json' for both '.json' in the "train" and "val" folders.
 4. Reduplicate gripperAI_final.py and rename it to your usage.
 5. Go through your mrcnn python file and modify the code as indicated in the file.
