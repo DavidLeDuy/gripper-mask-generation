@@ -1,4 +1,6 @@
+#!/bin/python3.*
 import json
+import os.path
 
 
 
@@ -6,17 +8,16 @@ _name = ""
 _classes = []
 settings_dict = {}
 
-try:
-    f = open("settings.json")
+if os.path.isfile("settings.json") :
     chose = input("File already exists. Do you want to overwrite it? y/n ")
     if chose == "y" or chose == "Y":
         pass
     else:
-        exit()
-except FileNotFoundError:
-    pass
-finally:
-    f.close()
+        print("exiting setup")
+        exit(1)
+else:
+    open("settings.json","w")
+
 
 
 print("This is the setup to train your own model")

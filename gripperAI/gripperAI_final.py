@@ -60,12 +60,12 @@ DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
 
 class GripperConfig(Config):
-    
+    with open(ROOT_DIR+"/settings.json") as file:
+        user_settings = json.load(file)
     """Configuration for training on the toy dataset.
     Derives from the base Config class and overrides some values.
     """
     # Give the configuration a recognizable name
-    # NOTE Change a name you want
     NAME = user_settings["name"]
 
     # We use a GPU with 12GB memory, which can fit two images.
@@ -73,7 +73,8 @@ class GripperConfig(Config):
     IMAGES_PER_GPU = 2
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + int(user_settings["c_nr"])  # NOTE Background + objects
+    # Background + objects
+    NUM_CLASSES = 1 + int(user_settings["c_nr"])
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 100
@@ -89,6 +90,8 @@ class GripperDataset(utils.Dataset):
         """
         # FIXME Add classes. We have 2 classes here to add.
         counter = 0
+        with open(ROOT_DIR+"/settings.json") as file:
+            user_settings = json.load(file)
         for item in user_settings["classes"]:
             counter = counter + 1
             self.add_class(user_settings["name"], counter, item)
@@ -125,10 +128,10 @@ class GripperDataset(utils.Dataset):
             # the outline of each object instance. There are stores in the
             # shape_attributes (see json format above)
             if type(a['regions']) is dict:
-                polygons = [r['shape_attributes'] for r in a['regions'].values()]
+                shape = [r['shape_attributes'] for r in a['regions'].values()]
                 names = [r['region_attributes'] for r in a['regions'].values()]
             else:
-                polygons = [r['shape_attributes'] for r in a['regions']]
+                shape = [r['shape_attributes'] for r in a['regions']]
                 names = [r['region_attributes'] for r in a['regions']]
 
             
@@ -138,16 +141,18 @@ class GripperDataset(utils.Dataset):
             image_path = os.path.join(dataset_dir, a['filename'])
             image = skimage.io.imread(image_path)
             height, width = image.shape[:2]
-            #NOTE Add image.
+            # Add image.
             self.add_image(
                 user_settings["name"],
                 image_id=a['filename'],  # use file name as a unique image id
                 path=image_path,
                 width=width, height=height,
-                polygons=polygons,
+                shape=shape,
                 names=names)
 
     def load_mask(self, image_id):
+        with open(ROOT_DIR+"/settings.json") as file:
+            user_settings = json.load(file)
         """Generate instance masks for an image.
        Returns:
         masks: A bool array of shape [height, width, instance count] with
@@ -163,17 +168,36 @@ class GripperDataset(utils.Dataset):
         # [height, width, instance_count]
         info = self.image_info[image_id]
         class_names = info["names"]
-        mask = np.zeros([info["height"], info["width"], len(info["polygons"])],
+        mask = np.zeros([info["height"], info["width"], len(info["shape"])],
                         dtype=np.uint8)
-        for i, p in enumerate(info["polygons"]):
-            # Get indexes of pixels inside the polygon and set them to 1
-            rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
+        for i, p in enumerate(info["shape"]):
+            # parses the different shapes
+            # Get indexes of pixels inside the shape and set them to 1
+            shape_type = p["name"]
+            if shape_type=="polygon":
+                rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
+            elif shape_type=="circle":
+                rr, cc = skimage.draw.circle(int(p['cy']), int(p['cx']),int(p['r']))
+            elif shape_type=="ellipse":
+                # NOTE not tested
+                rr, cc = skimage.draw.ellipse(int(p['cy']), int(p['cx']),int(p['ry']),int(p['rx']))
+            elif shape_type=="rect":
+                # NOTE not tested
+                start = (p['y'],p['x'])
+                extent = (p['height'],p['width'])
+                rr, cc = skimage.draw.rectangle(start, extent=extent)
+            else:
+                raise Exception("The shape: '{}' you declared in the json file is not supported!".format(shape_type))
             mask[rr, cc, i] = 1
         # Assign class_ids by reading class_names
-        class_ids = np.zeros([len(info["polygons"])])
+        # to check for errors in the data
+        # plt.imshow(np.squeeze(mask))
+        # plt.savefig("test.png")
+        # exit(1)
+        class_ids = np.zeros([len(info["shape"])])
         # In the gripper dataset, pictures are labeled with name 'a' and 'r' representing arm and ring.
         for i, p in enumerate(class_names):
-        #FIXME "name" is the attributes name decided when labeling, etc. 'region_attributes': {name:'a'}
+        # "name" is the attributes name decided when labeling, etc. 'region_attributes': {name:'a'}
             counter = 0
             for item in user_settings["classes"]:
                 counter+=1
@@ -264,7 +288,7 @@ def detect_and_color_splash(model, image_path=None, video_path=None, out_dir='')
     class_names = ['BG']
     for item in user_settings["classes"]:
         class_names.append(item)
-
+        
     # Image or video?
     if image_path:
         # Run model detection and generate the color splash effect
@@ -376,6 +400,8 @@ def get_ax(rows=1, cols=1, size=16):
 ############################################################
 
 if __name__ == '__main__':
+    with open(ROOT_DIR+"/settings.json") as file:
+        user_settings = json.load(file)
     import argparse
     
     # Parse command line arguments
@@ -385,10 +411,10 @@ if __name__ == '__main__':
                         metavar="<command>",
                         help="'train' or 'splash'")
     parser.add_argument('--dataset', required=False,
-                        metavar="/home/simon/mask_rcnn/data/gripper",
+                        metavar="/home/mask_rcnn/data/gripper",
                         help='Directory of the gripper dataset')
     parser.add_argument('--weights', required=True,
-                        metavar="/home/simon/logs/weights.h5",
+                        metavar="/home/logs/weights.h5",
                         help="Path to weights .h5 file or 'coco'")
     parser.add_argument('--logs', required=False,
                         default=DEFAULT_LOGS_DIR,
@@ -405,9 +431,7 @@ if __name__ == '__main__':
                         help="Subset of dataset to run prediction on")
     args = parser.parse_args()
 
-    user_settings = {}
-    with open("settings.json") as file:
-        user_settings = json.load(file)
+
     # Validate arguments
     if args.command == "train":
         assert args.dataset, "Argument --dataset is required for training"

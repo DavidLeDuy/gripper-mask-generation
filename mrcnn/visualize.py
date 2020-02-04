@@ -103,7 +103,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
         print("\n*** No instances to display *** \n")
     else:
         assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
-    print("sjdlajkhdlkahdkjahskdhalkdhlkajhdlkakdhkahldkjshak")
+    print("")
     # If no axis is passed, create one and automatically call show()
     auto_show = False
     if not ax:
