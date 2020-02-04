@@ -1,7 +1,7 @@
 # Introduction
 
 Based on [Mask RCNN](https://github.com/matterport/Mask_RCNN), we developed a easy to use mask-generation programm.
-Just clone it and try it out. Of course you can also train on your own dataset.
+Just clone it and try it out. You can follow the steps to train on your own dataset.
 
 # Installation
 
