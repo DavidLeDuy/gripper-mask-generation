@@ -5,7 +5,7 @@ SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 # exit if fails
 set -e
 
-cd $SCRIPTPATH"/gripperAI" 
+cd $SCRIPTPATH"/project" 
 
 #create data folders
 cF(){

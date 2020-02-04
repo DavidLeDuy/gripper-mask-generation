@@ -6,7 +6,7 @@ results/
 temp/
 test/
 .*
-gripperAI/data/
+project/data/
 settings.json
 
 # Byte-compiled / optimized / DLL files
