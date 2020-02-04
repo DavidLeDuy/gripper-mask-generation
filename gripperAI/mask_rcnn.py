@@ -13,21 +13,21 @@ Modified by: David Le Duy and Pin-Zhen(Kelly) Chen for GripperAI in FESTO
 Usage: import the module (run fromthe command line as such:
 
     #Train a new model starting from pre-trained COCO weights
-    python gripperAI_final.py train --dataset=/PATH/TO/dataset --weights=coco
+    python mask_rcnn.py train --dataset=/PATH/TO/dataset --weights=coco
 
     #Train a new model starting from pre-trained ImageNet weights
-    python gripperAI_final.py train --dataset=/PATH/TO/dataset --weights=imagenet
+    python mask_rcnn.py train --dataset=/PATH/TO/dataset --weights=imagenet
 
     # Continue training the last model you trained. This will find
     # the last trained weights in the model directory.
-    python gripperAI_final.py train --dataset=/PATH/TO/dataset --weights=last
+    python mask_rcnn.py train --dataset=/PATH/TO/dataset --weights=last
 
     #Detect and color splash on a image with the last model you trained.
     #This will find the last trained weights in the model directory.
-    python gripperAI_final.py splash --weights=last --image=/home/...../*.jpg
+    python mask_rcnn.py splash --weights=last --image=/home/...../*.jpg
 
     #Detect and color splash on a video with a specific pre-trained weights of yours.
-    python gripperAI_final.py splash --weights=gripperAImodel_final.h5  --video=test_video.mp4
+    python mask_rcnn.py splash --weights=gripperAImodel_final.h5  --video=test_video.mp4
 """
 
 import os
