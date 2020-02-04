@@ -18,6 +18,7 @@ cF(){
     fi
 }
 cF data
+cF models
 cd data
 cF train
 cF test
