@@ -1,13 +1,11 @@
 # Introduction
 
-Based on [Mask RCNN](https://github.com/matterport/Mask_RCNN), we developed a gripper-mask-generation programm.
-You could clone it and try it out. Of course you can also train on your own data.
-Welcome to ask questions on the issues, we would like to share our experience to you.
-Thanks again for the great work of [matterport/Mask_RCNN](https://github.com/matterport/Mask_RCNN) !
+Based on [Mask RCNN](https://github.com/matterport/Mask_RCNN), we developed a easy to use mask-generation programm.
+Just clone it and try it out. Of course you can also train on your own dataset.
 
 # Installation
 
-1. Clone this repository
+1. Clone this repository (duh)
 2. Run setup.sh
    ```
    sh setup.sh
@@ -62,11 +60,14 @@ Thanks again for the great work of [matterport/Mask_RCNN](https://github.com/mat
    ```
    python3 settings.py
    ```
-3. Use [VGG Annotation](http://www.robots.ox.ac.uk/~vgg/software/via/via_demo.html) to label train/val data. settings.py creates a folders for your data. Suggested ratio of "train"/"val" = 8/2. And export annotations as JSON.
-   Rectangle, Polygon, Circle, Ellipse are supported.
+3. Use [VGG Annotation](http://www.robots.ox.ac.uk/~vgg/software/via/via_demo.html) to label train/val data. Suggested ratio of "train"/"val" = 8/2. And export annotations as JSON.
+    Region types: Rectangle, Polygon, Circle, Ellipse are supported.
 4. Rename JSON file as 'via_region_data.json' for both '.json' in the "train" and "val" folders.
-5. Finally you can start to train on your own dataset. Our default pre-trained model is 'coco.'
+5. Finally you can start to train on your own dataset. The default pre-trained model is 'coco.'
    ```
    python [project_name].py train --dataset=/PATH/TO/dataset --weights=coco
    ```
 6. After training, you can run your python file again with "splash" command
+   ```
+   python [project_name].py splash --weights=[your weight path] --image=[image path]
+   ```
